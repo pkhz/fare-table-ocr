@@ -36,6 +36,7 @@ DEBUG_DIR = Path("output-cells-debug")
 BLUR_KERNEL = (5, 5)
 MIN_ROW_DISTANCE = 15
 MIN_COL_DISTANCE = 15
+MIN_ROW_HEIGHT = 20  # rows smaller than this are merged with the next row
 PROMINENCE_FACTOR = 0.05
 REFINE_WINDOW = 5  # pixels to search around detected boundary for refinement
 
@@ -177,6 +178,33 @@ def refine_boundary(image, approximate_pos, axis=0, window=REFINE_WINDOW):
     return refined_pos
 
 
+def merge_small_rows(row_boundaries, min_height=MIN_ROW_HEIGHT):
+    """
+    Merge rows that are too small into the next row.
+
+    Sometimes the header row gets split by a false boundary detection.
+    This function removes boundaries that create rows smaller than
+    min_height by merging them with the following row.
+    """
+    if len(row_boundaries) < 3:
+        return row_boundaries
+
+    merged = [row_boundaries[0]]  # Always keep the first boundary
+
+    for i in range(1, len(row_boundaries) - 1):
+        row_height = row_boundaries[i] - merged[-1]
+
+        if row_height < min_height:
+            # Skip this boundary (merge with next row)
+            continue
+        else:
+            merged.append(row_boundaries[i])
+
+    merged.append(row_boundaries[-1])  # Always keep the last boundary
+
+    return np.array(merged, dtype=int)
+
+
 def detect_rows(table):
     """
     Detect row boundaries using median-color projection.
@@ -185,6 +213,7 @@ def detect_rows(table):
     2. Compute gradient of the median profile
     3. Find peaks = approximate boundaries
     4. Refine each boundary by searching for max color difference
+    5. Merge rows that are too small (header fix)
     """
     # Step 1: Median color profile (per row)
     profile = compute_median_color_profile(table, axis=1)
@@ -205,7 +234,11 @@ def detect_rows(table):
         refined = refine_boundary(table, peak, axis=1)
         refined_peaks.append(refined)
 
-    return np.array(refined_peaks, dtype=int)
+    # Step 6: Add table edges and merge small rows
+    row_boundaries = np.concatenate([[0], refined_peaks, [table.shape[0]]])
+    row_boundaries = merge_small_rows(row_boundaries)
+
+    return row_boundaries
 
 
 def detect_cols(row_strip):
@@ -294,12 +327,9 @@ def crop_cells():
     # Preprocess (blur to reduce noise)
     table_blur = preprocess(table)
 
-    # Detect row boundaries
-    row_peaks = detect_rows(table_blur)
-    print(f"Detected {len(row_peaks)} row boundaries")
-
-    # Add table edges as boundaries
-    row_boundaries = np.concatenate([[0], row_peaks, [table.shape[0]]])
+    # Detect row boundaries (includes edges + merge of small rows)
+    row_boundaries = detect_rows(table_blur)
+    print(f"Detected {len(row_boundaries) - 1} rows")
 
     # Process rows sequentially with position memory
     total_cells = 0
