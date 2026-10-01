@@ -148,23 +148,23 @@ def refine_boundary(image, approximate_pos, axis=0, window=REFINE_WINDOW):
     if end - start < 2:
         return approximate_pos
 
-    # Compute color difference between adjacent pixels in the window
+    # Compute color difference between adjacent pixels in the window.
+    # Clip both slices to the same length: when the window reaches the
+    # image edge, [start:end] and [start+1:end+1] can differ by one.
     if axis == 0:
         # Vertical boundary: compare column i with column i+1
-        diff = np.linalg.norm(
-            lab[:, start:end].astype(np.float32) -
-            lab[:, start+1:end+1].astype(np.float32),
-            axis=2
-        )
+        a = lab[:, start:end].astype(np.float32)
+        b = lab[:, start+1:end+1].astype(np.float32)
+        n = min(a.shape[1], b.shape[1])
+        diff = np.linalg.norm(a[:, :n] - b[:, :n], axis=2)
         # Sum over rows to get a single score per column position
         score = np.sum(diff, axis=0)
     else:
         # Horizontal boundary: compare row i with row i+1
-        diff = np.linalg.norm(
-            lab[start:end, :].astype(np.float32) -
-            lab[start+1:end+1, :].astype(np.float32),
-            axis=2
-        )
+        a = lab[start:end, :].astype(np.float32)
+        b = lab[start+1:end+1, :].astype(np.float32)
+        n = min(a.shape[0], b.shape[0])
+        diff = np.linalg.norm(a[:n] - b[:n], axis=2)
         # Sum over columns
         score = np.sum(diff, axis=1)
 
@@ -309,6 +309,15 @@ def crop_cells():
     """
     OUTPUT_DIR.mkdir(exist_ok=True)
     DEBUG_DIR.mkdir(exist_ok=True)
+
+    # Remove stale cells from previous runs, otherwise old files with
+    # different geometry linger next to new output and look like bad crops.
+    removed = 0
+    for stale in OUTPUT_DIR.glob("cell_*.png"):
+        stale.unlink()
+        removed += 1
+    if removed:
+        print(f"Removed {removed} stale cell files from previous run")
 
     # Load image
     image = cv2.imread(IMAGE_PATH)
