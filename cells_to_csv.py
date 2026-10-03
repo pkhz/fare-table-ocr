@@ -31,8 +31,10 @@ import pytesseract
 from PIL import Image
 
 from ocr_rows import normalize_value
+from paths import load_paths
 
-pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+_PATHS = load_paths()
+pytesseract.pytesseract.tesseract_cmd = _PATHS["TESSERACT_CMD"]
 
 CELLS_DIR = Path("output-cells")
 HORIZONTAL_DIR = Path("output-headers/horizontal")
@@ -276,7 +278,7 @@ def majority(values):
 # BRT1-7, KG04-35, PY01-41.  The GTFS fare matrix is symmetric, so the
 # transposed lookup always succeeds.
 
-GTFS_FARES_PATH = Path("data/fares.json")  # GTFS fares (optional, for cross-check)
+GTFS_FARES_PATH = Path(_PATHS["GTFS_FARES_PATH"])  # GTFS fares (optional, for cross-check)
 
 GTFS_CODES = (
     [f"KJ{i}" for i in range(1, 38)] +               # rows 0-36
