@@ -378,6 +378,37 @@ for word, left, width in zip(data["text"], data["left"], data["width"]):
 | **PSM sweep** | psm 7/8/10 tried per cell until a valid `D.DD` was found |
 | **Diagonal masking** | diagonal cell blanked out (filled white) so OCR skips it |
 
+**Bug history: sequential token-counting → positional mapping**
+
+The row-strip reader initially placed values by **counting tokens in order** (split OCR'd row text into tokens, assign token *N* to column *N*). This worked until a single value was misread or two adjacent values merged into one token — every column after that point then received the wrong value, or no value at all, for the rest of the row. The failure was visible as long runs of blank cells following one bad read, not random scattered gaps.
+
+The fix was to place each matched value by its **actual x-pixel position** (from Tesseract's `image_to_data` word boxes) instead of its position in the token sequence:
+
+```python
+for match in VALUE_PATTERN.finditer(word):
+    frac_center = (match.start() + match.end()) / 2 / len(word)
+    x_orig = (left + frac_center * width) / STRIP_SCALE
+    col = int(x_orig / CELL_WIDTH)
+```
+
+This confined a bad read to the one cell it affected instead of corrupting the rest of the row. A related fix was reverting `VALUE_PATTERN` from a permissive digit-reconstruction regex (chunking arbitrary digit runs into `D.DD` guesses) back to a strict `\d\.\d\d` match for the row-wide pass — the permissive version, applied to a long run-on OCR string, produced nonsense chunking (e.g. `"1.301902002803..."`). The permissive reconstruction in `normalize_value()` was kept only for isolated single-cell/span crops, where there's no long string to mis-chunk.
+
+**Gap-fill performance: span batching + trailing-blank skip**
+
+An early version of the gap-fill pass OCR'd each missing cell individually, which was too slow at full scale (one Tesseract subprocess call per missing cell; some rows had 100+ gaps). Two optimizations made a full 157×157 run practical:
+
+- **Span batching**: consecutive missing columns are grouped with `itertools.groupby` and OCR'd as a single cropped strip, rather than one Tesseract call per cell. Per-cell OCR (`ocr_cell`) is used only as a last resort when a span still comes up empty.
+- **Trailing-blank skip**: gap-fill stops at the last recovered value in a row instead of continuing to re-check cells past it, since the matrix is upper-triangular and the empty tail is legitimately blank, not missing data.
+
+**Measured results** (before moving on to the dynamic-grid approach):
+
+| Stage | Fill rate | Notes |
+|---|---|---|
+| Original hybrid (sequential token counting) | 37.8% | cascading blanks after any misread |
+| After positional (x-position) mapping, full 157×157 | 48.1% | ~163/11,855 filled cells (1.4%) still malformed |
+| After adding CLAHE fallback, 20×20 sample | 90.2% | sample-only, not re-validated at full scale |
+| Full 157×157 run time (span-batched gap-fill) | 53m26s | vs. an estimated 60+ min for uncapped per-cell gap-fill |
+
 **`normalize_value()` post-processing** (still used today):
 
 ```python
@@ -389,7 +420,7 @@ def normalize_value(text):
         return f"{cleaned[0]}.{cleaned[1]}"
 ```
 
-**Why it failed**: **column drift** — the 157×157 grid was skewed, so columns didn't line up with headers. A value at x=500 might be column 16 or 17 depending on the row.
+**Why it failed**: **column drift** — the 157×157 grid was skewed, so columns didn't line up with headers. A value at x=500 might be column 16 or 17 depending on the row. The positional-mapping and CLAHE fixes improved accuracy and stability considerably (see measured results above), but could not correct for the underlying grid drift itself — that required the dynamically-detected grid in the second try.
 
 **Lesson**: row-wide OCR is fast but requires accurate column positions. The `normalize_value()` function was **kept** and is still used in the second try.
 
