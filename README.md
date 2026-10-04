@@ -45,6 +45,9 @@ Python, OpenCV, Pillow, Tesseract OCR, NumPy, SciPy, Matplotlib
 ## Usage
 
 ```bash
+# import modules/lib/dependents/packages
+pip install requirements.txt
+
 # Full pipeline (crop → OCR → cross-check → CSV/JSON)
 python crop_cells.py
 python crop_headers.py
