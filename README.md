@@ -2,7 +2,7 @@
 
 An experimental computer vision and image processing project exploring how a large transit fare-table image specifically in this use case is RapidKL integrated fare table image (`image/faretable.png`, 5000×4596 px) can be converted into structured, machine-readable data.
 
-The project tried to achieve perfect OCR accuracy for the transit fare-table image.
+The project investigates whether OCR accuracy can be improved to near-perfect levels through different processing and recognition methods, and whether any remaining errors are attributable to limitations in the source image quality.
 
 ## Project Overview
 
@@ -119,5 +119,6 @@ See [FINDINGS.md](FINDINGS.md) for the full algorithm description, error analysi
 
 ## Resources
 
-Faretable image (Cash/Token) - https://myrapid.com.my/bus-train/rapid-kl/integrated-fare-table/
+Faretable image (Cash/Token) - https://myrapid.com.my/bus-train/rapid-kl/integrated-fare-table
+
 Data - RapidKL GTFS Data

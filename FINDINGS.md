@@ -464,7 +464,7 @@ def normalize_value(text):
 | 4 | `crop3.py` | [IP] | Fixed 157×157 geometry | Grid not uniform — drift accumulates |
 | 5 | `ocr_cells.py` | [OCR] | Per-cell Tesseract | Inherited misalignment, no error correction |
 | 6 | `ocr_rows.py` | [OCR] | Row-strip + x-position | Column drift — skewed grid |
-| 7 | `img2table` | [CV] | Off-the-shelf table OCR | Relies on drawn gridlines, not color |
+| 7 | `(tool) img2table` | [CV] | Off-the-shelf table OCR | Relies on drawn gridlines, not color |
 
 **Common failure pattern**: every first-try script assumed the grid was either **line-based** or **perfectly uniform**. Both assumptions are false for this table.
 
