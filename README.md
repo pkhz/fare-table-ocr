@@ -120,3 +120,4 @@ See [FINDINGS.md](FINDINGS.md) for the full algorithm description, error analysi
 ## Resources
 
 Faretable image (Cash/Token) - https://myrapid.com.my/bus-train/rapid-kl/integrated-fare-table/
+Data - RapidKL GTFS Data
