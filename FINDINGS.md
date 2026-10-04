@@ -28,6 +28,10 @@ Multiple thresholding strategies handle varying cell backgrounds:
 - **Inverted Otsu**: for light-on-dark (blue diagonal) cells
 - **Min-channel masking**: `min(B,G,R) ≥ threshold` isolates white text on blue by exploiting that white has all channels high while blue has low R,G
 
+![Preprocessing recipes on one cell: original, grayscale, Otsu, inverted](figures/ocr_recipes.png)
+
+![Min-channel masks at three thresholds for a blue diagonal cell](figures/blue_cell_recipes.png)
+
 ### Color-Based Segmentation
 Blue diagonal cells are detected by sampling corner pixels: `B - R > 50` indicates blue background. This routes cells to the appropriate OCR recipe set.
 
@@ -174,6 +178,8 @@ def cross_check_with_gtfs(grid):
 | 0→4 | 88 | similar shapes |
 | other | ~972 | various |
 
+![Every single-digit misread counted: round digits dominate](figures/error_distribution.png)
+
 ### Root cause: image resolution
 
 Cells are ~27×29 px with digits only **3-4 px tall**. At this resolution:
@@ -191,6 +197,8 @@ Cells are ~27×29 px with digits only **3-4 px tall**. At this resolution:
 6 white diagonal cells where the image shows non-standard values (GTFS says 0.80):
 - Rows 57, 65, 67, 85, 127, 151 → image values 1.40, 1.70, 1.40, 1.60, 1.10, 1.50
 
+![Where the remaining differences sit — the blue diagonal and the cross-line MR/BRT fares](figures/error_heatmap.png)
+
 ## Final Results (24,336 cells)
 
 | Metric | Value |
@@ -204,9 +212,19 @@ Cells are ~27×29 px with digits only **3-4 px tall**. At this resolution:
 | Range | 0.00 – 14.74 |
 | Cells corrected by cross-check | 2,806 |
 
+![Pipeline summary tiles: final results at a glance](figures/pipeline_summary.png)
+
+![OCR vs GTFS baseline before and after the cross-check](figures/baseline_vs_ocr.png)
+
+![The final 156x156 fare matrix](figures/fare_matrix.png)
+
 ## Approach Evolution
 
 Every experiment below is tagged with its primary discipline: **[IP]** image processing, **[CV]** computer vision, **[OCR]** text recognition.
+
+![All 14 experiments: 7 first-try failures vs 5 working second-try pieces + 2 rejected](figures/tries_overview.png)
+
+![Accuracy evolution across approaches: 0.87% → 72.06% → 95.01%](figures/evolution.png)
 
 ---
 
@@ -214,7 +232,7 @@ Every experiment below is tagged with its primary discipline: **[IP]** image pro
 
 #### 1. Image inspection — `properties.py`, `resolution.py` **[IP]**
 
-**Goal**: establish baseline facts about the source image before choosing an approach.
+**Goal**: get the basics about the source image before picking an approach.
 
 ```python
 with Image.open(path) as img:
@@ -229,7 +247,7 @@ with Image.open(path) as img:
 - Palette mode means the image uses a fixed color table — important for later color-based segmentation
 - No DPI means all work happens purely in pixel space
 
-**Outcome**: reconnaissance only — no extraction attempted.
+**Outcome**: just a look-around — nothing extracted yet.
 
 ---
 
@@ -440,7 +458,7 @@ def normalize_value(text):
 
 | # | Script | Discipline | Method | Why it failed |
 |---|--------|-----------|--------|---------------|
-| 1 | `properties.py`, `resolution.py` | [IP] | Image inspection | Reconnaissance only |
+| 1 | `properties.py`, `resolution.py` | [IP] | Image inspection | Just a look-around |
 | 2 | `crop.py` | [CV] | Morphological line detection | No drawn gridlines — structure is color-based |
 | 3 | `crop2.py`, `temp.py` | [IP+CV] | HSV yellow thresholding | Blue/white cells break single-color model |
 | 4 | `crop3.py` | [IP] | Fixed 157×157 geometry | Grid not uniform — drift accumulates |
@@ -488,6 +506,8 @@ row_peaks, _ = find_peaks(-row_profile_smooth, prominence=3, distance=20)
 | **Small row merging** | rows < 20 px merged with the next row |
 
 **Result**: 157 rows × 157 columns detected with sub-pixel accuracy — **no hardcoded constants**.
+
+![Detected boundaries: gradient profiles with marked peaks and an overlay on the actual image](figures/grid_detection.png)
 
 ---
 
@@ -613,6 +633,8 @@ def cross_check_with_gtfs(grid):
 
 **Result**: 2,806 cells corrected, final accuracy 95.01% exact GTFS match (remaining 4.99% are GTFS errors, not OCR errors).
 
+![Example cells before and after the cross-check](figures/before_after.png)
+
 ---
 
 ### Second Try Summary
@@ -624,6 +646,8 @@ def cross_check_with_gtfs(grid):
 | 3 | `cells_to_csv.py` | [IP+OCR] | Multi-recipe (gray/Otsu/inv × trim × scale × PSM) | covers all cell types |
 | 4 | `cells_to_csv.py` | [OCR] | Symmetry-pooled majority voting | ~50% error reduction |
 | 5 | `cells_to_csv.py` | [OCR] | GTFS cross-check with error model | 2,806 cells corrected → 95.01% |
+
+![What each pipeline component contributes](figures/method_stats.png)
 
 ---
 
@@ -639,6 +663,8 @@ The first tries treated the table as a **fixed-geometry** problem (hardcoded gri
 | GTFS cross-check | No — hardcoded station mapping for this image |
 | Blue diagonal handling | No — specific to this fare table |
 | `ocr_rows.py` (`normalize_value`) | Yes — generic text normalization |
+
+![1st try vs 2nd try, measured against the same GTFS baseline](figures/first_vs_second.png)
 
 ## Evaluated & Rejected Approaches
 

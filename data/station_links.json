@@ -1,0 +1,444 @@
+{
+  "KJ37": {
+    "name": "Putra Heights",
+    "interchange": [
+      "SP31"
+    ],
+    "connection": []
+  },
+  "KJ16": {
+    "name": "Bank Negara",
+    "interchange": [],
+    "connection": [
+      "AG6",
+      "SP6"
+    ]
+  },
+  "PY18": {
+    "name": "Kuala Lumpur",
+    "interchange": [],
+    "connection": [
+      "KG16",
+      "KJ14"
+    ]
+  },
+  "MR1": {
+    "name": "KL Sentral",
+    "interchange": [],
+    "connection": [
+      "KG15"
+    ]
+  },
+  "PY07": {
+    "name": "Kepong Sentral",
+    "interchange": [],
+    "connection": [
+      "PY08"
+    ]
+  },
+  "BRT1": {
+    "name": "Setia Jaya",
+    "interchange": [],
+    "connection": [
+      "KJ31"
+    ]
+  },
+  "AG1": {
+    "name": "Sentul Timur",
+    "interchange": [
+      "SP1"
+    ],
+    "connection": []
+  },
+  "AG2": {
+    "name": "Sentul",
+    "interchange": [
+      "SP2"
+    ],
+    "connection": []
+  },
+  "AG3": {
+    "name": "Titiwangsa",
+    "interchange": [
+      "MR11",
+      "PY17",
+      "SP3"
+    ],
+    "connection": []
+  },
+  "AG4": {
+    "name": "PWTC",
+    "interchange": [
+      "SP4"
+    ],
+    "connection": [
+      "KJ37"
+    ]
+  },
+  "AG5": {
+    "name": "Sultan Ismail",
+    "interchange": [
+      "SP5"
+    ],
+    "connection": [
+      "MR9"
+    ]
+  },
+  "AG6": {
+    "name": "Bandaraya-UOB",
+    "interchange": [
+      "SP6"
+    ],
+    "connection": [
+      "KJ16"
+    ]
+  },
+  "AG7": {
+    "name": "Masjid Jamek",
+    "interchange": [
+      "KJ13",
+      "SP7"
+    ],
+    "connection": []
+  },
+  "AG8": {
+    "name": "Plaza Rakyat",
+    "interchange": [
+      "KG17",
+      "SP8"
+    ],
+    "connection": []
+  },
+  "AG9": {
+    "name": "BBCC–Hang Tuah",
+    "interchange": [
+      "SP9"
+    ],
+    "connection": []
+  },
+  "AG10": {
+    "name": "Pudu",
+    "interchange": [
+      "SP10"
+    ],
+    "connection": []
+  },
+  "AG11": {
+    "name": "Chan Sow Lin",
+    "interchange": [
+      "PY24",
+      "SP11"
+    ],
+    "connection": []
+  },
+  "SP1": {
+    "name": "Sentul Timur",
+    "interchange": [
+      "AG1"
+    ],
+    "connection": []
+  },
+  "SP2": {
+    "name": "Sentul",
+    "interchange": [
+      "AG2"
+    ],
+    "connection": []
+  },
+  "SP3": {
+    "name": "Titiwangsa",
+    "interchange": [
+      "AG3",
+      "MR11",
+      "PY17"
+    ],
+    "connection": []
+  },
+  "SP4": {
+    "name": "PWTC",
+    "interchange": [
+      "AG4"
+    ],
+    "connection": [
+      "KJ37"
+    ]
+  },
+  "SP5": {
+    "name": "Sultan Ismail",
+    "interchange": [
+      "AG5"
+    ],
+    "connection": [
+      "MR9"
+    ]
+  },
+  "SP6": {
+    "name": "Bandaraya-UOB",
+    "interchange": [
+      "AG6"
+    ],
+    "connection": [
+      "KJ16"
+    ]
+  },
+  "SP7": {
+    "name": "Masjid Jamek",
+    "interchange": [
+      "AG7",
+      "KJ13"
+    ],
+    "connection": []
+  },
+  "SP8": {
+    "name": "Plaza Rakyat",
+    "interchange": [
+      "AG8",
+      "KG17"
+    ],
+    "connection": []
+  },
+  "SP9": {
+    "name": "BBCC–Hang Tuah",
+    "interchange": [
+      "AG9"
+    ],
+    "connection": []
+  },
+  "SP10": {
+    "name": "Pudu",
+    "interchange": [
+      "AG10"
+    ],
+    "connection": []
+  },
+  "SP11": {
+    "name": "Chan Sow Lin",
+    "interchange": [
+      "AG11",
+      "PY24"
+    ],
+    "connection": []
+  },
+  "SP16": {
+    "name": "Sungai Besi",
+    "interchange": [
+      "PY29"
+    ],
+    "connection": []
+  },
+  "SP31": {
+    "name": "Putra Heights",
+    "interchange": [
+      "KJ37"
+    ],
+    "connection": []
+  },
+  "KJ9": {
+    "name": "Ampang Park",
+    "interchange": [],
+    "connection": [
+      "PY20"
+    ]
+  },
+  "KJ12": {
+    "name": "Dang Wangi",
+    "interchange": [],
+    "connection": [
+      "MR8"
+    ]
+  },
+  "KJ13": {
+    "name": "Masjid Jamek",
+    "interchange": [
+      "AG7",
+      "SP7"
+    ],
+    "connection": []
+  },
+  "KJ14": {
+    "name": "Pasar Seni",
+    "interchange": [
+      "KG16"
+    ],
+    "connection": [
+      "PY18"
+    ]
+  },
+  "KJ15": {
+    "name": "KL Sentral–redONE",
+    "interchange": [],
+    "connection": [
+      "KG15"
+    ]
+  },
+  "KJ31": {
+    "name": "USJ 7",
+    "interchange": [
+      "BRT1"
+    ],
+    "connection": []
+  },
+  "SA1": {
+    "name": "Bandar Utama",
+    "interchange": [],
+    "connection": [
+      "KG09"
+    ]
+  },
+  "MR8": {
+    "name": "Bukit Nanas",
+    "interchange": [],
+    "connection": [
+      "KJ12"
+    ]
+  },
+  "MR9": {
+    "name": "Medan Tuanku",
+    "interchange": [],
+    "connection": [
+      "AG5",
+      "SP5"
+    ]
+  },
+  "KG04": {
+    "name": "Kwasa Damansara",
+    "interchange": [
+      "PY01"
+    ],
+    "connection": []
+  },
+  "KG09": {
+    "name": "Bandar Utama",
+    "interchange": [],
+    "connection": [
+      "SA1"
+    ]
+  },
+  "KG15": {
+    "name": "Muzium Negara",
+    "interchange": [],
+    "connection": [
+      "MR1"
+    ]
+  },
+  "KG16": {
+    "name": "Pasar Seni",
+    "interchange": [
+      "KJ14"
+    ],
+    "connection": [
+      "PY18"
+    ]
+  },
+  "KG17": {
+    "name": "Merdeka",
+    "interchange": [
+      "AG8",
+      "SP8"
+    ],
+    "connection": []
+  },
+  "KG20": {
+    "name": "Tun Razak Exchange (TRX)",
+    "interchange": [
+      "PY23"
+    ],
+    "connection": []
+  },
+  "PY01": {
+    "name": "Kwasa Damansara",
+    "interchange": [
+      "KG04"
+    ],
+    "connection": []
+  },
+  "PY08": {
+    "name": "Sri Damansara Timur",
+    "interchange": [],
+    "connection": [
+      "PY07"
+    ]
+  },
+  "PY17": {
+    "name": "Titiwangsa",
+    "interchange": [
+      "AG3",
+      "MR11",
+      "SP3"
+    ],
+    "connection": []
+  },
+  "PY20": {
+    "name": "Ampang Park",
+    "interchange": [],
+    "connection": [
+      "KJ9"
+    ]
+  },
+  "PY23": {
+    "name": "Tun Razak Exchange (TRX)",
+    "interchange": [
+      "KG20"
+    ],
+    "connection": []
+  },
+  "PY24": {
+    "name": "Chan Sow Lin",
+    "interchange": [
+      "AG11",
+      "SP11"
+    ],
+    "connection": []
+  },
+  "PY29": {
+    "name": "Sungai Besi",
+    "interchange": [
+      "SP16"
+    ],
+    "connection": []
+  },
+  "PY41": {
+    "name": "Putrajaya Sentral",
+    "interchange": [],
+    "connection": [
+      ""
+    ]
+  },
+  "MR11": {
+    "name": "Titiwangsa",
+    "interchange": [
+      "AG3",
+      "PY17",
+      "SP3"
+    ],
+    "connection": []
+  },
+  "SA7": {
+    "name": "Glenmarie",
+    "interchange": [],
+    "connection": [
+      "KJ27"
+    ]
+  },
+  "KJ27": {
+    "name": "Glenmarie 2",
+    "interchange": [],
+    "connection": [
+      "SA7"
+    ]
+  },
+  "AG13": {
+    "name": "Maluri",
+    "interchange": [],
+    "connection": [
+      "KG22"
+    ]
+  },
+  "KG22": {
+    "name": "Maluri",
+    "interchange": [],
+    "connection": [
+      "AG13"
+    ]
+  }
+}

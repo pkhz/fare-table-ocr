@@ -28,7 +28,7 @@ This experiment provided practical experience with image processing, computer vi
 
 ### Technologies
 
-Python, OpenCV, Pillow, Tesseract OCR, NumPy, SciPy
+Python, OpenCV, Pillow, Tesseract OCR, NumPy, SciPy, Matplotlib
 
 ## Files
 
@@ -37,6 +37,8 @@ Python, OpenCV, Pillow, Tesseract OCR, NumPy, SciPy
 | `crop_cells.py` | Detects the 156×156 matrix grid dynamically (LAB median-color projection + gradient peak finding), crops each cell to `output-cells/cell_r{row}_c{col}.png` |
 | `crop_headers.py` | Crops horizontal (title/abbrev bands), vertical (index/name/abbrev), and corner header cells into `output-headers/{horizontal,vertical,corner}/` |
 | `cells_to_csv.py` | OCRs all cells (multi-recipe Tesseract + symmetry-pooled majority voting), cross-checks against GTFS fares, writes `output-ocr/{stations.csv, columns.csv, fare_matrix_cells.csv, fare_matrix_cells.json}` |
+| `make_figures.py` | Generates the 13 figures in `figures/` (fare matrix heatmap, OCR vs GTFS baseline, per-method stats, pipeline summary, all 14 experiments, 1st vs 2nd try, grid detection, accuracy evolution, recipe comparisons). Charts/heatmaps/profiles use matplotlib; image composites and text panels use OpenCV |
+| `make_figures_cv2.py` | Legacy all-OpenCV version of the generator — same 13 plots drawn with OpenCV only, writes to `figures/cv2/` so both styles can be compared side by side |
 | `ocr_rows.py` | Provides `normalize_value()` — normalizes OCR text to `D.DD` fare format |
 | `image/faretable.png` | Source fare table image (downloaded from the myrapid fare website) |
 
@@ -53,13 +55,20 @@ python cells_to_csv.py 10x10
 
 # Quick test (first 5×5 corner)
 python cells_to_csv.py 5
+
+# FINDINGS.md figures → figures/*.png
+python make_figures.py                # all plots (matplotlib + OpenCV)
+python make_figures.py grid_detection # single plot
+
+# Legacy all-OpenCV rendering → figures/cv2/*.png (for comparison)
+python make_figures_cv2.py
 ```
 
 ## Requirements
 
 - Python 3.x with `.venv` (see `.venv/Scripts/python.exe`)
 - Tesseract OCR at `C:\Program Files\Tesseract-OCR\tesseract.exe`
-- Python packages: `pytesseract`, `Pillow`, `opencv-python`, `numpy`, `scipy`, `python-dotenv`
+- Python packages: `pytesseract`, `Pillow`, `opencv-python`, `numpy`, `scipy`, `python-dotenv`, `matplotlib` (charts in `make_figures.py`)
 
 ## Environment & Paths
 
