@@ -122,3 +122,10 @@ See [FINDINGS.md](FINDINGS.md) for the full algorithm description, error analysi
 Faretable image (Cash/Token) - https://myrapid.com.my/bus-train/rapid-kl/integrated-fare-table
 
 Data - RapidKL GTFS Data
+
+## AI Assistance
+
+- **First try** — Claude Sonnet 5 (via GitHub Copilot): the fixed-geometry experiments
+  (`crop.py` → `ocr_rows.py`)
+- **Second try** — LongCat 2.5 Preview Free/MiMo-v2.6-Flash Free (via OpenCode): 
+  (`crop_cells.py`, `cells_to_csv.py`) + the figures in `figures/`
