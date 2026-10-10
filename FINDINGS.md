@@ -50,7 +50,7 @@ Each cell is read by multiple (recipe × preprocessing) combinations. The fare t
 ### Error Modeling
 Errors are categorized by digit-level diff analysis:
 - Single-digit misreads (same length, 1 char differs) → OCR error, correctable
-- Multi-digit / length mismatches → GTFS data error, keep OCR
+- Multi-digit / length mismatches → OCR interpretation error (low-res misread); the cross-check keeps the OCR value, so these remain in the output
 - Empty cells → complete read failure, correctable from GTFS
 
 ## Algorithm
@@ -131,7 +131,7 @@ GTFS_CODES = (
 )
 ```
 
-Correction rules (validated by visual inspection):
+Correction rules (as implemented):
 
 ```python
 def cross_check_with_gtfs(grid):
@@ -152,7 +152,7 @@ def cross_check_with_gtfs(grid):
                 diff_pos = [i for i in range(len(ocr_v)) if ocr_v[i] != gtfs_v[i]]
                 if len(diff_pos) == 1:
                     grid[r][c] = grid[c][r] = gtfs_v    # single-digit misread → GTFS
-                # multi-digit difference: keep OCR (GTFS wrong for cross-line MR/BRT fares)
+                # multi-digit difference: keep OCR (kept by the rule — these turn out to be OCR misreads)
 ```
 
 ## Error Analysis
@@ -162,9 +162,9 @@ def cross_check_with_gtfs(grid):
 | Category | Count | Example | Resolution |
 |---|---|---|---|
 | Single-digit misread | ~2,799 | `3.50`→`3.00` (5→0) | GTFS cross-check |
-| Multi-digit misread | 604 | `5.70` vs `4.40` | Keep OCR (GTFS wrong) |
+| Multi-digit misread | 604 | `5.70` vs `4.40` | Keep OCR (misread kept) |
 | Empty cell | 7 | readable text, no OCR output | GTFS cross-check |
-| Length mismatch | 12 | `10.40` vs `3.00` | Keep OCR (GTFS wrong) |
+| Length mismatch | 12 | `10.40` vs `3.00` | Keep OCR (misread kept) |
 
 ### Single-digit misread distribution
 
@@ -187,17 +187,15 @@ Cells are ~27×29 px with digits only **3-4 px tall**. At this resolution:
 - `3` vs `5` vs `8` differ by 1-2 pixels
 - `1` vs `7` differ by 1 pixel
 
-### GTFS data errors (image is correct)
+### Remaining mismatches (OCR interpretation errors)
 
-12 cross-line MR/BRT fares where GTFS disagrees with the image (verified visually):
-- r41c83: image `10.40`, GTFS `3.00`
-- r85c90: image `11.10`, GTFS `4.70`
-- (10 more)
+Both sources check out — the source image shows the correct fares, and GTFS is correct too. The only error left is the method's interpretation of the low-resolution digits: the OCR misreads values at 3–4 px.
 
-6 white diagonal cells where the image shows non-standard values (GTFS says 0.80):
-- Rows 57, 65, 67, 85, 127, 151 → image values 1.40, 1.70, 1.40, 1.60, 1.10, 1.50
+- 611 cells (4.99%) where the OCR reading differs from the real fare — e.g. `r41c83`: OCR read `10.40`, correct `3.00`; `r85c90`: OCR read `11.10`, correct `4.70`
+- The cross-check leaves them untouched: its "multi-digit mismatch → keep OCR" rule assumed GTFS was wrong there — it isn't, so the misreads stay in the output
+- 6 of them are white diagonal cells the `WHITE_DIAGONAL` rule kept (rows 57, 65, 67, 85, 127, 151 — OCR read 1.40, 1.70, 1.40, 1.60, 1.10, 1.50 against the real 0.80)
 
-![Where the remaining differences sit — the blue diagonal and the cross-line MR/BRT fares](figures/error_heatmap.png)
+![Where the 611 remaining OCR misreads sit in the matrix](figures/error_heatmap.png)
 
 ## Final Results (24,336 cells)
 
@@ -207,8 +205,8 @@ Cells are ~27×29 px with digits only **3-4 px tall**. At this resolution:
 | Bad format | 0 |
 | Asymmetric pairs | 0 |
 | Exact GTFS match | **95.01%** |
-| Remaining mismatch | 4.99% (all verified GTFS errors) |
-| Diagonal | 136× `0.80`, 14× `0.90`, 6 white cells — all correct |
+| Remaining mismatch | 4.99% (OCR interpretation errors the cross-check keeps) |
+| Diagonal | 136× `0.80`, 14× `0.90`, 6 white cells (known misreads kept) |
 | Range | 0.00 – 14.74 |
 | Cells corrected by cross-check | 2,806 |
 
@@ -609,7 +607,7 @@ def cross_check_with_gtfs(grid):
         for c in range(r, cols):
             gtfs_v = lookup_gtfs(r, c)
             if r == c and r in WHITE_DIAGONAL:
-                continue  # keep OCR (GTFS wrong for these 6 cells)
+                continue  # keep OCR (manual rule — later verified: these are misreads)
             if r == c:
                 grid[r][c] = grid[c][r] = gtfs_v  # blue diagonal: GTFS always correct
             ocr_v = grid[r][c]
@@ -621,17 +619,17 @@ def cross_check_with_gtfs(grid):
                     grid[r][c] = grid[c][r] = gtfs_v    # single-digit misread → GTFS
 ```
 
-**Correction rules** (validated by visual inspection):
+**Correction rules** (as implemented):
 
 | OCR vs GTFS | Action | Reason |
 |-------------|--------|--------|
 | Empty OCR | → GTFS | complete read failure |
 | Same length, 1 char differs | → GTFS | single-digit misread (e.g., `3.50`→`3.00`) |
-| Multi-digit / length mismatch | keep OCR | GTFS wrong for cross-line MR/BRT fares |
+| Multi-digit / length mismatch | keep OCR | assumed GTFS wrong — actually OCR misreads, so they stay in the output |
 | Blue diagonal | → GTFS | GTFS (0.80/0.90) always correct |
-| White diagonal (6 cells) | keep OCR | image shows non-standard values |
+| White diagonal (6 cells) | keep OCR | manual rule — later verified: misreads (real fare 0.80) |
 
-**Result**: 2,806 cells corrected, final accuracy 95.01% exact GTFS match (remaining 4.99% are GTFS errors, not OCR errors).
+**Result**: 2,806 cells corrected, final accuracy 95.01% exact GTFS match (remaining 4.99% are OCR interpretation errors the cross-check keeps).
 
 ![Example cells before and after the cross-check](figures/before_after.png)
 
@@ -738,3 +736,4 @@ Only one candidate from the original list survives evaluation: **contextual corr
 2. ~~**Sharpening/deconvolution**~~ — rejected (analysis: screenshot has no blur; see above)
 3. **Contextual correction**: fares increase monotonically with distance along a line — flag outliers (untested)
 4. **Higher-resolution source**: the fundamental limit is 3-4 px digits (not available)
+5. **Trust GTFS on multi-digit mismatches**: GTFS checked out correct — flipping the cross-check rule from "keep OCR" to "→ GTFS" would fix the remaining 611 misreads (~100% match, untested)

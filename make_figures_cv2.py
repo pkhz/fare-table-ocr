@@ -73,7 +73,7 @@ except (FileNotFoundError, KeyError):
 # Documented statistics (FINDINGS.md) used where the pipeline output has been
 # post-processed and the intermediate stage can no longer be re-measured.
 BEFORE_DIFFS = 3422      # differences vs GTFS before cross-check (upper triangle)
-OCR_ERRORS_BEFORE = 2806  # real OCR errors in that set (rest are GTFS-side)
+OCR_ERRORS_BEFORE = 2806  # single-digit/empty misreads (rest are multi-digit misreads)
 CORRECTED = 2806           # cells fixed by the cross-check
 VOTING_CUT = 0.50          # symmetry voting removes ~50% of single-recipe errors
 
@@ -417,16 +417,16 @@ def plot_baseline_vs_ocr():
         put(img, note, (40, note_y), 0.5, DARK)
 
     stage(150, "Before GTFS cross-check", match_before, diffs_before,
-          f"differences: {OCR_ERRORS_BEFORE:,} OCR errors + {diffs_before - OCR_ERRORS_BEFORE:,} GTFS-side "
-          f"(multi-digit / length mismatches where the image is right)")
+          f"differences: {OCR_ERRORS_BEFORE:,} single-digit / empty misreads + "
+          f"{diffs_before - OCR_ERRORS_BEFORE:,} multi-digit / length misreads (all OCR interpretation errors)")
     stage(350, "After GTFS cross-check", match_after, diffs_after,
-          f"remaining {diffs_after:,} differences all verified as GTFS errors (image correct); "
-          f"{CORRECTED:,} OCR errors corrected")
+          f"remaining {diffs_after:,} are OCR misreads the cross-check keeps (image + GTFS both correct); "
+          f"{CORRECTED:,} corrected")
 
     y = 560
     swatch(img, 40, y, GREEN, "exact match with GTFS")
     swatch(img, 330, y, RED, "difference vs GTFS")
-    put(img, "Cross-check rules: empty / single-digit misread -> GTFS;  multi-digit mismatch -> keep OCR (GTFS wrong)",
+    put(img, "Cross-check rules: empty / single-digit misread -> GTFS;  multi-digit mismatch -> keep OCR (misread kept)",
         (40, y + 44), 0.5, DARK)
     save(img, "baseline_vs_ocr.png")
 
